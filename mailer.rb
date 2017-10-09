@@ -35,7 +35,7 @@ post '/' do
   subject = '[danalol] new contact'
   from = 'noreply@dana.lol'
 
-  if params[:email]
+  unless params[:email].empty?
     subject += " from #{params[:email]}"
     from = params[:email]
   end
