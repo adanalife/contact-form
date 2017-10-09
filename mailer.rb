@@ -47,5 +47,5 @@ post '/' do
     body:    params[:message]
   )
 
-  redirect 'https://www.dana.lol'
+  redirect 'https://www.dana.lol/success'
 end
