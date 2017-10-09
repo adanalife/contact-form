@@ -30,15 +30,22 @@ get '/' do
 end
 
 post '/' do
-  email = ''
-  params.each do |value|
-    email += "#{value[0]}: #{value[1]}\n"
+  puts params
+
+  subject = '[danalol] new contact'
+  from = 'noreply@dana.lol'
+
+  if params[:email]
+    subject += " from #{params[:email]}"
+    from = params[:email]
   end
-  puts email
+
   Pony.mail(
-    to: ENV['email_recipients'],
-    from: 'noreply@dana.lol',
-    subject: '[danalol] new contact',
-    body: email
+    to:      ENV['email_recipients'],
+    from:    from,
+    subject: subject,
+    body:    params[:message]
   )
+
+  redirect 'https://www.dana.lol'
 end
