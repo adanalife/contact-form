@@ -32,19 +32,16 @@ end
 post '/' do
   puts params
 
-  subject = '[danalol] new contact'
-  from = 'noreply@dana.lol'
-
-  unless params[:email].empty?
-    subject += " from #{params[:email]}"
-    from = params[:email]
-  end
+  to = ENV['EMAIL_RECIPIENTS']
+  from = params[:email].empty? ? 'noreply@dana.lol' : params[:email]
+  subject = "[danalol] new contact from #{request.ip}"
+  body = params[:message]
 
   Pony.mail(
-    to:      ENV['EMAIL_RECIPIENTS'],
+    to:      to,
     from:    from,
     subject: subject,
-    body:    params[:message]
+    body:    body
   )
 
   redirect 'https://www.dana.lol/success'
