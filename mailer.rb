@@ -8,7 +8,7 @@ before do
 end
 
 # whitelist should be a space separated list of URLs
-whitelist = ENV['whitelist'].split
+whitelist = ENV['WHITELIST'].split
 
 set :protection, origin_whitelist: whitelist
 
@@ -41,7 +41,7 @@ post '/' do
   end
 
   Pony.mail(
-    to:      ENV['email_recipients'],
+    to:      ENV['EMAIL_RECIPIENTS'],
     from:    from,
     subject: subject,
     body:    params[:message]

@@ -15,8 +15,8 @@ ahead and add your sendgrid username and password. Huzzah automation.
 While you have heroku open, go ahead and set up the following:
 
 ```
-heroku config:set email_recipients="demo@password.com"
-heroku config:set whitelist="http://www.yourstaticsite.com/"
+heroku config:set EMAIL_RECIPIENTS="demo@password.com"
+heroku config:set WHITELIST="http://www.yourstaticsite.com/"
 ```
 
 If you want to send from multiple sites, or you have multiple domains, set the
