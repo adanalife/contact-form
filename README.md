@@ -1,5 +1,4 @@
-middleman-contact-form
-======================
+# danalol-contact-form
 
 Simple sinatra application, intended for heroku to send emails from contact
 requests from a static middleman app deployed on s3.
@@ -30,9 +29,3 @@ created heroku application:
 
 You should be able to use as many fields as you want, the notifier by default
 simply sends you a field per line.
-
-TODO: 
-
-- test framework
-- write a little errors library in js to include in the static site, all ajaxy
-  like
