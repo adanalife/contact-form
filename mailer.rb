@@ -32,9 +32,17 @@ end
 post '/' do
   puts params
 
+  # this is a little janky, I'm using this project to power both the /contact and the /ama pages
+  # the /ama page does not have an email field
+  if params[:email]
+    from = params[:email].empty? ? 'noreply@dana.lol' : params[:email]
+    subject = "[danalol] new contact from #{request.ip}"
+  else
+    from = 'ama@dana.lol'
+    subject = "[danalol] new AMA from #{request.ip}"
+  end
+
   to = ENV['EMAIL_RECIPIENTS']
-  from = params[:email].empty? ? 'noreply@dana.lol' : params[:email]
-  subject = "[danalol] new contact from #{request.ip}"
   body = params[:message]
 
   Pony.mail(
