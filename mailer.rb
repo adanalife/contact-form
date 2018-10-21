@@ -31,6 +31,7 @@ end
 
 post '/' do
   puts params
+  logger.info(params.inspect)
 
   # this is a little janky, I'm using this project to power both the /contact and the /ama pages
   # the /ama page does not have an email field
