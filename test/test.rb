@@ -51,13 +51,13 @@ class MailerTest < Minitest::Test
     assert_includes delivered.subject, 'new AMA'
   end
 
-  def test_cors_header_echoed_for_whitelisted_origin
+  def test_cors_header_echoed_for_allowlisted_origin
     header 'Origin', 'https://www.dana.lol'
     get '/healthz'
     assert_equal 'https://www.dana.lol', last_response.headers['Access-Control-Allow-Origin']
   end
 
-  def test_cors_header_absent_for_unlisted_origin
+  def test_cors_header_absent_for_non_allowlisted_origin
     header 'Origin', 'https://evil.example.com'
     get '/healthz'
     assert_nil last_response.headers['Access-Control-Allow-Origin']

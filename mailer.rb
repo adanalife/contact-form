@@ -1,13 +1,13 @@
 require 'sinatra'
 require 'pony'
 
-WHITELIST = (ENV['WHITELIST'] || '').split
+ALLOWLIST = (ENV['ALLOWLIST'] || '').split
 FROM_DOMAIN = ENV['FROM_DOMAIN'] || 'dana.lol'
 SUCCESS_URL = ENV['SUCCESS_URL'] || "https://www.#{FROM_DOMAIN}/success"
 
 before do
   origin = request.env['HTTP_ORIGIN']
-  if origin && WHITELIST.include?(origin)
+  if origin && ALLOWLIST.include?(origin)
     headers['Access-Control-Allow-Origin']  = origin
     headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
     headers['Access-Control-Allow-Headers'] = 'accept, content-type, origin'
@@ -15,7 +15,7 @@ before do
   end
 end
 
-set :protection, origin_whitelist: WHITELIST
+set :protection, origin_whitelist: ALLOWLIST  # rack-protection's API name is origin_whitelist
 
 Pony.options = {
   via: :smtp,

@@ -16,7 +16,7 @@ sent from `ama@<from-domain>`).
 | GET     | `/`        | 302 → `https://www.<from-domain>`                                 |
 | POST    | `/`        | Sends the message as email; 302 → `<success-url>`                 |
 | GET     | `/healthz` | `{"status":"ok"}` (k8s liveness/readiness probe)                  |
-| OPTIONS | `/`        | Browser CORS preflight; allows whitelisted origins                |
+| OPTIONS | `/`        | Browser CORS preflight; allows allowlisted origins                |
 
 ## Configuration
 
@@ -25,7 +25,7 @@ All config is via environment variables.
 | Var                | Default                                | Notes                                                           |
 |--------------------|----------------------------------------|-----------------------------------------------------------------|
 | `EMAIL_RECIPIENTS` | _(required)_                           | Recipient address(es) for delivered mail.                       |
-| `WHITELIST`        | _(empty)_                              | Space-separated list of allowed `Origin` headers (CORS + CSRF). |
+| `ALLOWLIST`        | _(empty)_                              | Space-separated list of allowed `Origin` headers (CORS + CSRF). |
 | `FROM_DOMAIN`      | `dana.lol`                             | Used for `noreply@`, `ama@`, and the success-URL default.       |
 | `SUCCESS_URL`      | `https://www.<from-domain>/success`    | Where to redirect after successful POST.                        |
 | `SMTP_HOST`        | `email-smtp.us-east-1.amazonaws.com`   | SES SMTP endpoint by default.                                   |
@@ -60,7 +60,7 @@ multi-arch list).
 docker build -t contact-form:dev .
 docker run --rm -p 8080:8080 \
   -e EMAIL_RECIPIENTS=you@example.com \
-  -e WHITELIST='https://www.dana.lol https://staging.dana.lol' \
+  -e ALLOWLIST='https://www.dana.lol https://staging.dana.lol' \
   -e SMTP_USERNAME=... \
   -e SMTP_PASSWORD=... \
   contact-form:dev
