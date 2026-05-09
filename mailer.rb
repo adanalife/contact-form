@@ -1,57 +1,66 @@
 require 'sinatra'
 require 'pony'
 
+WHITELIST = (ENV['WHITELIST'] || '').split
+FROM_DOMAIN = ENV['FROM_DOMAIN'] || 'dana.lol'
+SUCCESS_URL = ENV['SUCCESS_URL'] || "https://www.#{FROM_DOMAIN}/success"
+
 before do
-  headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-  headers['Access-Control-Allow-Origin']  = '*'
-  headers['Access-Control-Allow-Headers'] = 'accept, authorization, origin'
+  origin = request.env['HTTP_ORIGIN']
+  if origin && WHITELIST.include?(origin)
+    headers['Access-Control-Allow-Origin']  = origin
+    headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+    headers['Access-Control-Allow-Headers'] = 'accept, content-type, origin'
+    headers['Vary'] = 'Origin'
+  end
 end
 
-# whitelist should be a space separated list of URLs
-whitelist = ENV['WHITELIST'].split
-
-set :protection, origin_whitelist: whitelist
+set :protection, origin_whitelist: WHITELIST
 
 Pony.options = {
   via: :smtp,
   via_options: {
-    address: 'smtp.sendgrid.net',
-    port: '587',
-    domain: 'heroku.com',
-    user_name: ENV['SENDGRID_USERNAME'],
-    password: ENV['SENDGRID_PASSWORD'],
-    authentication:  :plain,
+    address:              ENV['SMTP_HOST'] || 'email-smtp.us-east-1.amazonaws.com',
+    port:                 (ENV['SMTP_PORT'] || '587').to_i,
+    domain:               ENV['SMTP_DOMAIN'] || FROM_DOMAIN,
+    user_name:            ENV['SMTP_USERNAME'],
+    password:             ENV['SMTP_PASSWORD'],
+    authentication:       :plain,
     enable_starttls_auto: true
   }
 }
 
+get '/healthz' do
+  content_type :json
+  '{"status":"ok"}'
+end
+
 get '/' do
-  redirect 'https://www.dana.lol'
+  redirect "https://www.#{FROM_DOMAIN}"
+end
+
+options '/' do
+  200
 end
 
 post '/' do
-  puts params
   logger.info(params.inspect)
 
-  # this is a little janky, I'm using this project to power both the /contact and the /ama pages
-  # the /ama page does not have an email field
+  # the same backend serves both /contact (has email field) and /ama (does not)
   if params[:email]
-    from = params[:email].empty? ? 'noreply@dana.lol' : params[:email]
-    subject = "[danalol] new contact from #{request.ip}"
+    from = params[:email].empty? ? "noreply@#{FROM_DOMAIN}" : params[:email]
+    subject = "[#{FROM_DOMAIN}] new contact from #{request.ip}"
   else
-    from = 'ama@dana.lol'
-    subject = "[danalol] new AMA from #{request.ip}"
+    from = "ama@#{FROM_DOMAIN}"
+    subject = "[#{FROM_DOMAIN}] new AMA from #{request.ip}"
   end
 
-  to = ENV['EMAIL_RECIPIENTS']
-  body = params[:message]
-
   Pony.mail(
-    to:      to,
+    to:      ENV['EMAIL_RECIPIENTS'],
     from:    from,
     subject: subject,
-    body:    body
+    body:    params[:message]
   )
 
-  redirect 'https://www.dana.lol/success'
+  redirect SUCCESS_URL
 end
