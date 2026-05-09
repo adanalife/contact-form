@@ -1,0 +1,14 @@
+.git
+.github
+.gitignore
+.dockerignore
+.tool-versions
+README.md
+LICENSE
+Rakefile
+test/
+tmp/
+log/
+*.gem
+.bundle
+vendor/bundle
