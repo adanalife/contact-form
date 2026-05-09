@@ -1,8 +1,11 @@
 source 'https://rubygems.org'
-ruby '2.5.3'
 
-gem 'sinatra'
+gem 'sinatra', '~> 4.0'
+gem 'rackup'
+gem 'puma'
 gem 'pony'
-gem 'rack-test'
-gem 'minitest'
 
+group :test do
+  gem 'rack-test'
+  gem 'minitest'
+end
