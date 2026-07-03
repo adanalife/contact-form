@@ -1,31 +1,49 @@
 # contact-form
 
-Simple sinatra application, intended for heroku to send emails from contact
-requests from a static middleman app deployed on s3.
+Small Sinatra app that backs the contact and AMA forms on
+[dana.lol](https://www.dana.lol). A `POST /` sends the form fields as an
+email; `GET /` just redirects to https://www.dana.lol.
 
-You are going to want to create a heroku application for this.
+The same endpoint powers both forms: if the submission includes an `email`
+field it's treated as a contact request (sent from that address, or
+`noreply@dana.lol` if blank); without one it's treated as an AMA question and
+sent from `ama@dana.lol`.
 
-`heroku create website-contact`
+## Configuration
 
-Then, you should go ahead and get sendgrid starter established. This will go
-ahead and add your sendgrid username and password. Huzzah automation.
+The app reads three environment variables:
 
-`heroku addons:add sendgrid:starter`
+- `SENDGRID_USERNAME` / `SENDGRID_PASSWORD` — SendGrid SMTP credentials.
+- `WHITELIST` — **space-separated** list of allowed origin URLs. This is the
+  origin allowlist for form submissions; a comma-separated value is parsed as
+  a single URL and will silently break origin protection.
 
-While you have heroku open, go ahead and set up the following:
+Plus `EMAIL_RECIPIENTS` for where the mail goes.
+
+## Deploying (Heroku)
+
+The documented path is Heroku:
 
 ```
-heroku config:set EMAIL_RECIPIENTS="demo@password.com"
-heroku config:set WHITELIST="http://www.yourstaticsite.com/"
+heroku create website-contact
+heroku addons:add sendgrid:starter   # sets the SendGrid username/password
+heroku config:set EMAIL_RECIPIENTS="you@example.com"
+heroku config:set WHITELIST="https://www.yoursite.com/"
 ```
 
-If you want to send from multiple sites, or you have multiple domains, set the
-whitelist string to be a comma separated list of URLs.
+To allow multiple sites or domains, set `WHITELIST` to a space-separated
+list of URLs.
 
-On your static site, build a form where the action is the url of your newly
-created heroku application:
+On your site, point the form at the app:
 
-`<form action="https://website-contact.herokuapp.com/" "method="post">`
+```html
+<form action="https://website-contact.herokuapp.com/" method="post">
+```
 
-You should be able to use as many fields as you want, the notifier by default
-simply sends you a field per line.
+Use as many fields as you want — the mail body is the `message` field.
+
+## Tests
+
+```
+WHITELIST="http://example.com" bundle exec ruby test/test.rb
+```
